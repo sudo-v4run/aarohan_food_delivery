@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Hours & Holidays</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Manage Hours & Holidays for {{ restaurant_name }}</h2>
+    <form method="post" class="mb-4">
+        <input type="hidden" name="update_hours" value="1">
+        <table class="table table-bordered">
+            <thead>
+                <tr><th>Day</th><th>Open Time</th><th>Close Time</th></tr>
+            </thead>
+            <tbody>
+                {% for day in days %}
+                <tr>
+                    <td>{{ day }}</td>
+                    <td><input type="time" class="form-control" name="open_{{ day }}" value="{{ hours[day][0] if day in hours else '' }}" required></td>
+                    <td><input type="time" class="form-control" name="close_{{ day }}" value="{{ hours[day][1] if day in hours else '' }}" required></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Update Hours</button>
+    </form>
+    <h4>Holidays</h4>
+    <form method="post" class="mb-3 d-flex align-items-end">
+        <input type="hidden" name="add_holiday" value="1">
+        <div class="me-2">
+            <label for="holiday_date" class="form-label">Add Holiday</label>
+            <input type="date" class="form-control" id="holiday_date" name="holiday_date" required>
+        </div>
+        <button type="submit" class="btn btn-success">Add</button>
+    </form>
+    <ul class="list-group mb-3">
+        {% for h in holidays %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ h }}
+            <form method="post" style="display:inline;">
+                <input type="hidden" name="remove_holiday" value="{{ h }}">
+                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+            </form>
+        </li>
+        {% else %}
+        <li class="list-group-item">No holidays set.</li>
+        {% endfor %}
+    </ul>
+    <a href="/partner_dashboard" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>
+</body>
+</html> 

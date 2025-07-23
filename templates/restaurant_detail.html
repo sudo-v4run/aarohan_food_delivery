@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ restaurant[1] }} - Menu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>{{ restaurant[1] }}</h2>
+    <p>
+        <strong>Cuisine:</strong> {{ restaurant[2] }}<br>
+        <strong>Rating:</strong> {{ restaurant[3] }}<br>
+        <strong>Delivery Time:</strong> {{ restaurant[4] }} min<br>
+        <strong>Status:</strong> {% if restaurant[6] %}<span class="text-success">Open</span>{% else %}<span class="text-danger">Closed</span>{% endif %}
+    </p>
+    <h4>Menu</h4>
+    <div class="row">
+        {% for item in menu_items %}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item[1] }}</h5>
+                    <p class="card-text">{{ item[3] }}</p>
+                    <p class="card-text"><strong>Price:</strong> ₹{{ item[2] }}</p>
+                    <form method="post" action="/add_to_cart">
+                        <input type="hidden" name="item_id" value="{{ item[0] }}">
+                        <button type="submit" class="btn btn-success" {% if not restaurant[6] %}disabled{% endif %}>Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p>No menu items found.</p>
+        {% endfor %}
+    </div>
+    <hr>
+    <h4>Reviews</h4>
+    {% if avg_rating %}
+        <h5>Average Rating: <span class="text-warning">{{ avg_rating }}★</span></h5>
+    {% endif %}
+    {% if reviews %}
+        <ul class="list-group mb-3">
+            {% for r in reviews %}
+            <li class="list-group-item">
+                <strong class="text-warning">{{ r[0] }}★</strong> - {{ r[1] }}<br>
+                <small class="text-muted">{{ r[2] }}</small>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews yet.</p>
+    {% endif %}
+    <a href="/restaurants" class="btn btn-secondary mt-3">Back to Restaurants</a>
+</div>
+</body>
+</html> 

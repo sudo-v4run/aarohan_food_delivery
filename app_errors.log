@@ -1,0 +1,46 @@
+2025-07-19 18:02:08,945 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-19 18:02:08,949 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-19 18:14:19,408 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\user_routes.py', reloading
+2025-07-19 18:14:24,563 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-19 18:14:24,575 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-19 18:15:31,127 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\user_routes.py', reloading
+2025-07-19 18:15:33,755 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-19 18:15:33,763 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-21 12:53:32,659 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-21 12:53:34,348 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-21 12:53:34,359 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-21 12:59:16,103 ERROR root Thread-1 (run_server) : Delivery dashboard error: 'partner' is undefined
+2025-07-21 12:59:22,110 ERROR root Thread-1 (run_server) : Delivery dashboard error: 'partner' is undefined
+2025-07-21 12:59:29,121 ERROR root Thread-1 (run_server) : Delivery dashboard error: 'partner' is undefined
+2025-07-21 12:59:47,149 ERROR root Thread-1 (run_server) : Delivery dashboard error: 'partner' is undefined
+2025-07-21 12:59:52,992 ERROR root Thread-1 (run_server) : Delivery dashboard error: 'partner' is undefined
+2025-07-21 13:00:00,036 ERROR root Thread-1 (run_server) : Delivery dashboard error: 'partner' is undefined
+2025-07-21 13:02:05,231 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\delivery_routes.py', reloading
+2025-07-21 13:02:05,361 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-21 13:02:07,237 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-21 13:02:07,240 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-21 13:07:17,255 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\delivery_routes.py', reloading
+2025-07-21 13:07:17,380 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-21 13:07:19,240 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-21 13:07:19,243 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-21 13:09:55,051 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\delivery_routes.py', reloading
+2025-07-21 13:09:55,161 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-21 13:09:57,075 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-21 13:09:57,078 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-21 13:13:14,443 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\delivery_routes.py', reloading
+2025-07-21 13:13:14,568 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-21 13:13:16,528 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-21 13:13:16,544 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-21 13:14:16,718 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\delivery_routes.py', reloading
+2025-07-21 13:14:16,868 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-21 13:14:18,791 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-21 13:14:18,791 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-21 13:15:26,553 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-21 13:15:28,261 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-21 13:15:28,264 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-22 10:57:28,345 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-22 10:57:29,956 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-22 10:57:29,968 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 11:55:36,849 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 11:55:38,556 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 11:55:38,563 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
