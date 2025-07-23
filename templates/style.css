@@ -1,0 +1,86 @@
+/* Modern Food Delivery Theme */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+}
+
+.navbar {
+    background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.card {
+    border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(67, 206, 162, 0.08);
+    margin-bottom: 1.5rem;
+}
+.card-header {
+    background: #43cea2;
+    color: #fff;
+    border-radius: 1rem 1rem 0 0;
+    font-weight: 500;
+}
+.card-title {
+    color: #185a9d;
+    font-weight: 600;
+}
+
+.btn-primary, .btn-success, .btn-info, .btn-warning, .btn-danger {
+    border-radius: 2rem;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(67, 206, 162, 0.08);
+    transition: background 0.2s, color 0.2s;
+}
+.btn-primary {
+    background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+    border: none;
+}
+.btn-primary:hover {
+    background: linear-gradient(90deg, #185a9d 0%, #43cea2 100%);
+}
+
+.badge-success, .bg-success {
+    background-color: #43cea2 !important;
+}
+.badge-danger, .bg-danger {
+    background-color: #e74c3c !important;
+}
+
+input, select, textarea {
+    border-radius: 0.5rem !important;
+    border: 1px solid #e0e0e0 !important;
+}
+
+.form-control:focus {
+    border-color: #43cea2;
+    box-shadow: 0 0 0 0.2rem rgba(67, 206, 162, 0.15);
+}
+
+.alert {
+    border-radius: 0.75rem;
+}
+
+footer {
+    background: #185a9d;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+    margin-top: 2rem;
+    border-radius: 1rem 1rem 0 0;
+}
+
+/* Restaurant Card Customization */
+.card-title {
+    font-size: 1.25rem;
+}
+.card-text {
+    font-size: 1rem;
+}
+
+/* Add more custom styles as needed */ 

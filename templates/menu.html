@@ -3,46 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <title>Menu - Aarohan</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .food-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 1rem 1rem 0 0;
+    }
+    .card:hover {
+      box-shadow: 0 4px 24px rgba(67, 206, 162, 0.18);
+      transform: translateY(-4px) scale(1.02);
+      transition: 0.2s;
+    }
+  </style>
 </head>
-<body class="bg-light">
-  <div class="container mt-5">
-    <h2>Menu</h2>
-    <div class="mb-3">
-        <a href="/order_history" class="btn btn-info me-2">View Order History</a>
-        <a href="/restaurants" class="btn btn-primary">Browse Restaurants</a>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">Aarohan Food Delivery</a>
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" href="/order_history">Order History</a>
+        <a class="nav-link" href="/restaurants">Browse Restaurants</a>
+        <a class="nav-link" href="/cart">Cart</a>
+        <a class="nav-link" href="/logout">Logout</a>
+      </div>
     </div>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-success">Welcome, {{ session['user'] }}!</h2>
-        <div>
-          <a href="/cart" class="btn btn-outline-dark me-2">View Cart</a>
-          <a href="/logout" class="btn btn-danger">Logout</a>
+  </nav>
+  <div class="container mt-5">
+    <h2 class="fw-bold text-success mb-4">Welcome, {{ session['user'] }}!</h2>
+    <div class="mb-4 d-flex flex-wrap gap-2">
+      <a href="/" class="btn btn-secondary">Home</a>
+      <a href="/cart" class="btn btn-outline-dark">View Cart</a>
+      <a href="/restaurants" class="btn btn-primary">Browse Restaurants</a>
+      <a href="/order_history" class="btn btn-info">Order History</a>
+      <a href="/profile" class="btn btn-secondary">Profile</a>
+      <a href="/clear_cart" class="btn btn-warning">Clear Cart</a>
+      <a href="/logout" class="btn btn-danger">Logout</a>
+    </div>
+    <h3 class="mb-4">Today's Menu</h3>
+    <div class="row">
+      {% for item in food_items %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          {% set lower_name = item[1]|lower %}
+          {% if 'dosa' in lower_name %}
+            <img src="{{ url_for('static', filename='dosa.jpg') }}" alt="Dosa" class="food-img">
+          {% elif 'idly' in lower_name or 'vada' in lower_name %}
+            <img src="{{ url_for('static', filename='idly_vada.jpg') }}" alt="Idly Vada" class="food-img">
+          {% elif 'veg burger' in lower_name %}
+            <img src="{{ url_for('static', filename='veg_burger.jpg') }}" alt="Veg Burger" class="food-img">
+          {% elif 'tandoori roti' in lower_name %}
+            <img src="{{ url_for('static', filename='tandoori_roti.jpg') }}" alt="Tandoori Roti" class="food-img">
+          {% elif 'ghee rice' in lower_name %}
+            <img src="{{ url_for('static', filename='ghee_rice.jpg') }}" alt="Ghee Rice" class="food-img">
+          {% else %}
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80" alt="Food" class="food-img">
+          {% endif %}
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ item[1] }}</h5>
+            <p class="card-text">{{ item[3] }}</p>
+            <p class="card-text mb-1"><strong>Price:</strong> ₹{{ item[2] }}</p>
+            <p class="card-text mb-2"><strong>Restaurant:</strong> {{ item[4] }}</p>
+            <form method="post" action="/add_to_cart" class="mt-auto">
+              <input type="hidden" name="item_id" value="{{ item[0] }}">
+              <button type="submit" class="btn btn-success w-100">Add to Cart</button>
+            </form>
+          </div>
         </div>
       </div>
-      
-
-    <h3 class="mb-4">Today's Menu</h3>
-
-    <div class="row">
-        {% for item in food_items %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ item[1] }}</h5>
-                    <p class="card-text">{{ item[3] }}</p>
-                    <p class="card-text"><strong>Price:</strong> ₹{{ item[2] }}</p>
-                    <p class="card-text"><strong>Restaurant:</strong> {{ item[4] }}</p>
-                    <form method="post" action="/add_to_cart">
-                        <input type="hidden" name="item_id" value="{{ item[0] }}">
-                        <button type="submit" class="btn btn-success">Add to Cart</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <p>No food items found.</p>
-        {% endfor %}
+      {% else %}
+      <p>No food items found.</p>
+      {% endfor %}
     </div>
   </div>
+  <footer>
+    &copy; {{ 2024 }} Aarohan Food Delivery. All rights reserved.
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

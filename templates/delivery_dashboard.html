@@ -42,10 +42,10 @@
                     </div>
                     <div class="card-body">
                         <p><strong>Name:</strong> {{ partner['name'] }}</p>
-                        <p><strong>Phone:</strong> {{ partner[4] }}</p>
-                        <p><strong>Vehicle:</strong> {{ partner[6] }} ({{ partner[5] }})</p>
-                        <p><strong>Rating:</strong> ⭐ {{ "%.1f"|format(partner[9]) if partner[9] else "No ratings yet" }}</p>
-                        <p><strong>Total Deliveries:</strong> {{ partner[10] }}</p>
+                        <p><strong>Phone:</strong> {{ partner['phone'] }}</p>
+                        <p><strong>Vehicle:</strong> {{ partner['vehicle_type'] }} ({{ partner['vehicle_number'] }})</p>
+                        <p><strong>Rating:</strong> ⭐ {{ '%.1f'|format(partner['rating']) if partner['rating'] else 'No ratings yet' }}</p>
+                        <p><strong>Total Deliveries:</strong> {{ partner['total_deliveries'] }}</p>
                     </div>
                 </div>
             </div>
@@ -250,6 +250,44 @@
                     </div>
                 {% else %}
                     <p class="text-muted text-center">No delivery history yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Delivery Feedback Section -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>⭐ Delivery Feedback & Ratings</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Average Rating:</strong> {{ '%.1f'|format(avg_rating) if avg_rating else 'No ratings yet' }}</p>
+                {% if ratings and ratings|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Rating</th>
+                                    <th>Review</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in ratings %}
+                                <tr>
+                                    <td>#{{ r.order_id }}</td>
+                                    <td>{{ r.customer }}</td>
+                                    <td>⭐ {{ r.rating }}</td>
+                                    <td>{{ r.review or '-' }}</td>
+                                    <td>{{ r.timestamp }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No feedback or ratings yet.</p>
                 {% endif %}
             </div>
         </div>

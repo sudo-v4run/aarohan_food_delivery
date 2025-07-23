@@ -357,6 +357,7 @@ def restaurants():
     restaurants = cursor.fetchall()
     today = datetime.datetime.now().strftime('%A')
     now_time = datetime.datetime.now().strftime('%H:%M')
+    now_time_obj = datetime.datetime.strptime(now_time, '%H:%M').time()
     today_date = datetime.datetime.now().strftime('%Y-%m-%d')
     restaurant_list = []
     for r in restaurants:
@@ -367,11 +368,22 @@ def restaurants():
         hours = cursor.fetchone()
         is_open = r[6]
         debug_msg = f"[DEBUG] {r[1]} | Day: {today} | Now: {now_time} | Hours: {hours} | Holiday: {is_holiday} | DB is_open: {r[6]}"
-        if is_holiday or not hours or not (hours[0] <= now_time <= hours[1]):
+        if is_holiday or not hours:
             is_open = 0
             debug_msg += " | Marked Closed"
         else:
-            debug_msg += " | Marked Open"
+            try:
+                open_time_obj = datetime.datetime.strptime(hours[0], '%H:%M').time()
+                close_time_obj = datetime.datetime.strptime(hours[1], '%H:%M').time()
+                if open_time_obj <= now_time_obj <= close_time_obj:
+                    is_open = 1
+                    debug_msg += " | Marked Open"
+                else:
+                    is_open = 0
+                    debug_msg += " | Marked Closed (out of hours)"
+            except Exception as e:
+                is_open = 0
+                debug_msg += f" | Marked Closed (parse error: {e})"
         print(debug_msg)
         restaurant_list.append(list(r[:6]) + [is_open])
     conn.close()
@@ -447,6 +459,10 @@ def submit_review(order_id):
         return redirect(url_for('user.order_history'))
     cursor.execute('INSERT INTO reviews (user_id, restaurant_id, order_id, rating, review) VALUES (?, ?, ?, ?, ?)',
                    (user_id, restaurant_id, order_id, rating, review_text))
+    # Update restaurant's average rating
+    cursor.execute('SELECT AVG(rating) FROM reviews WHERE restaurant_id=?', (restaurant_id,))
+    avg_rating = cursor.fetchone()[0]
+    cursor.execute('UPDATE restaurants SET rating=? WHERE id=?', (avg_rating, restaurant_id))
     conn.commit()
     conn.close()
     flash('Thank you for your review!', 'success')

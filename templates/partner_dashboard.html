@@ -7,8 +7,16 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h2>Welcome, {{ partner }}!</h2>
-    <p>This is your restaurant partner dashboard.</p>
+    <h2>Welcome, {{ partner.username }}!</h2>
+    {% if partner.restaurant_name %}
+        <div class="alert alert-info">
+            <strong>Restaurant:</strong> {{ partner.restaurant_name }}<br>
+            <strong>Cuisine:</strong> {{ partner.cuisine }}<br>
+            <strong>Status:</strong> <span class="badge bg-{{ 'success' if partner.is_open else 'danger' }}">{{ 'Open' if partner.is_open else 'Closed' }}</span>
+        </div>
+    {% else %}
+        <div class="alert alert-warning">No restaurant profile found. Please create your restaurant profile.</div>
+    {% endif %}
     <a href="/partner_restaurant_profile" class="btn btn-primary me-2">Manage Restaurant Profile</a>
     <a href="/partner_menu" class="btn btn-success me-2">Manage Menu</a>
     <a href="/partner_orders" class="btn btn-warning me-2">Manage Orders</a>

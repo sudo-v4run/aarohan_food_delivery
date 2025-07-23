@@ -44,3 +44,42 @@
 2025-07-23 11:55:36,849 INFO werkzeug MainThread :  * Restarting with stat
 2025-07-23 11:55:38,556 WARNING werkzeug MainThread :  * Debugger is active!
 2025-07-23 11:55:38,563 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 15:02:00,865 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 15:02:02,536 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 15:02:02,540 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 15:07:02,054 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\delivery_routes.py', reloading
+2025-07-23 15:07:02,191 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 15:07:04,186 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 15:07:04,191 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 15:07:28,441 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\partner_routes.py', reloading
+2025-07-23 15:07:28,554 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 15:07:30,456 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 15:07:30,460 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 15:15:57,546 ERROR root Thread-1 (run_server) : Delivery dashboard error: object of type 'builtin_function_or_method' has no len()
+2025-07-23 15:16:00,968 ERROR root Thread-1 (run_server) : Delivery dashboard error: object of type 'builtin_function_or_method' has no len()
+2025-07-23 15:19:17,541 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\delivery_routes.py', reloading
+2025-07-23 15:19:17,658 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 15:19:19,746 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 15:19:19,746 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 15:23:31,573 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\user_routes.py', reloading
+2025-07-23 15:23:31,744 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 15:23:34,077 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 15:23:34,086 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 15:28:10,852 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\routes\\user_routes.py', reloading
+2025-07-23 15:28:10,966 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 15:28:13,040 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 15:28:13,046 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 15:29:08,196 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\fix_restaurant_ratings.py', reloading
+2025-07-23 15:29:08,313 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 15:29:10,255 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 15:29:10,258 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 15:30:08,300 INFO werkzeug MainThread :  * Detected change in 'C:\\Users\\Tarun Aarya\\aarohan_food_delivery\\fix_delivery_time.py', reloading
+2025-07-23 15:30:08,459 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 15:30:10,406 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 15:30:10,411 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 15:35:29,356 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 15:35:31,339 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 15:35:31,346 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424
+2025-07-23 16:14:08,566 INFO werkzeug MainThread :  * Restarting with stat
+2025-07-23 16:14:10,201 WARNING werkzeug MainThread :  * Debugger is active!
+2025-07-23 16:14:10,204 INFO werkzeug MainThread :  * Debugger PIN: 161-502-424

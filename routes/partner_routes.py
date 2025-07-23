@@ -52,7 +52,28 @@ def partner_login():
 def partner_dashboard():
     if 'partner' not in session:
         return redirect(url_for('partner.partner_login'))
-    return render_template('partner_dashboard.html', partner=session['partner'])
+    username = session['partner']
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        # Get owner and restaurant info
+        cursor.execute('SELECT id, restaurant_id FROM restaurant_owners WHERE username=?', (username,))
+        owner = cursor.fetchone()
+        partner_info = {'username': username}
+        restaurant = None
+        if owner and owner[1]:
+            cursor.execute('SELECT name, cuisine, is_open FROM restaurants WHERE id=?', (owner[1],))
+            restaurant = cursor.fetchone()
+            if restaurant:
+                partner_info['restaurant_name'] = restaurant[0]
+                partner_info['cuisine'] = restaurant[1]
+                partner_info['is_open'] = restaurant[2]
+        conn.close()
+        return render_template('partner_dashboard.html', partner=partner_info)
+    except Exception as e:
+        logging.error(f"Partner dashboard error: {e}")
+        flash('An error occurred while loading your dashboard. Please try again later.', 'danger')
+        return render_template('partner_dashboard.html', partner={'username': username})
 
 @partner_bp.route('/partner_restaurant_profile', methods=['GET', 'POST'])
 def partner_restaurant_profile():

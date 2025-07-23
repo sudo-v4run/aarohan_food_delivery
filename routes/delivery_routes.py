@@ -64,20 +64,39 @@ def delivery_login():
 
 @delivery_bp.route('/delivery_dashboard')
 def delivery_dashboard():
-    if 'delivery_partner' not in session:
+    # Use both session keys for backward compatibility
+    delivery_partner_username = session.get('delivery_partner')
+    delivery_partner_id = session.get('delivery_partner_id')
+    if not delivery_partner_username and not delivery_partner_id:
         return redirect(url_for('delivery.delivery_login'))
     try:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT id, name, is_available FROM delivery_partners WHERE username=?', (session['delivery_partner'],))
+        # Fetch partner info by id if available, else by username
+        if delivery_partner_id:
+            cursor.execute('SELECT * FROM delivery_partners WHERE id=?', (delivery_partner_id,))
+        else:
+            cursor.execute('SELECT * FROM delivery_partners WHERE username=?', (delivery_partner_username,))
         partner = cursor.fetchone()
         if not partner:
             conn.close()
             flash('Delivery partner not found.', 'danger')
             return redirect(url_for('delivery.delivery_login'))
+        # Set session id for future use
+        session['delivery_partner_id'] = partner[0]
         partner_id = partner[0]
-        partner_name = partner[1]
-        is_available = partner[2]
+        partner_data = {
+            'id': partner[0],
+            'username': partner[1],
+            'name': partner[3],
+            'phone': partner[4],
+            'vehicle_number': partner[5],
+            'vehicle_type': partner[6],
+            'is_available': partner[7],
+            'current_location': partner[8],
+            'rating': partner[9],
+            'total_deliveries': partner[10]
+        }
         # Assigned orders (not delivered)
         cursor.execute('''SELECT do.id, do.order_id, o.username, o.items, o.total, o.order_status, do.status, o.timestamp
                          FROM delivery_orders do
@@ -100,6 +119,15 @@ def delivery_dashboard():
                          ORDER BY do.delivery_time DESC
                          LIMIT 10''', (partner_id,))
         delivery_history = cursor.fetchall()
+        # Fetch delivery feedback/ratings
+        cursor.execute('''SELECT dr.rating, dr.review, dr.timestamp, dr.customer_username, o.id as order_id
+                          FROM delivery_ratings dr
+                          JOIN orders o ON dr.order_id = o.id
+                          WHERE dr.delivery_partner_id = ?
+                          ORDER BY dr.timestamp DESC''', (partner_id,))
+        ratings = cursor.fetchall()
+        cursor.execute('SELECT AVG(rating) FROM delivery_ratings WHERE delivery_partner_id=?', (partner_id,))
+        avg_rating = cursor.fetchone()[0]
         conn.close()
         # Process orders for template
         def process_items(items):
@@ -142,17 +170,28 @@ def delivery_dashboard():
                 'delivery_time': row[8]
             } for row in delivery_history
         ]
+        ratings_list = []
+        for rating, review, timestamp, customer, order_id in ratings:
+            ratings_list.append({
+                'rating': rating,
+                'review': review,
+                'timestamp': timestamp,
+                'customer': customer,
+                'order_id': order_id
+            })
         return render_template(
             'delivery_dashboard.html',
-            partner={'id': partner_id, 'name': partner_name, 'is_available': is_available},
+            partner=partner_data,
             assigned_orders=processed_assigned,
             available_orders=processed_available,
-            delivery_history=processed_history
+            delivery_history=processed_history,
+            ratings=ratings_list,
+            avg_rating=avg_rating
         )
     except Exception as e:
         logging.error(f"Delivery dashboard error: {e}")
         flash('An error occurred while loading your dashboard. Please try again later.', 'danger')
-        return render_template('delivery_dashboard.html', partner=None, assigned_orders=[], available_orders=[], delivery_history=[])
+        return render_template('delivery_dashboard.html', partner=None, assigned_orders=[], available_orders=[], delivery_history=[], ratings=[], avg_rating=None)
 
 @delivery_bp.route('/delivery_logout')
 def delivery_logout():
@@ -265,7 +304,11 @@ def update_order_status():
             return redirect(url_for('delivery.delivery_dashboard'))
         partner_id = partner[0]
         # Update delivery order status
-        cursor.execute('UPDATE delivery_orders SET status=? WHERE id=? AND delivery_partner_id=?', (new_status, delivery_order_id, partner_id))
+        if new_status == 'Delivered':
+            delivery_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            cursor.execute('UPDATE delivery_orders SET status=?, delivery_time=? WHERE id=? AND delivery_partner_id=?', (new_status, delivery_time, delivery_order_id, partner_id))
+        else:
+            cursor.execute('UPDATE delivery_orders SET status=? WHERE id=? AND delivery_partner_id=?', (new_status, delivery_order_id, partner_id))
         # If delivered, update order status in orders table
         if new_status == 'Delivered':
             cursor.execute('SELECT order_id FROM delivery_orders WHERE id=?', (delivery_order_id,))
