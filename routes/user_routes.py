@@ -15,26 +15,47 @@ def index():
 @user_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        uname = request.form['username']
+        full_name = request.form['full_name'].strip()
+        email = request.form['email'].strip()
+        phone = request.form['phone'].strip()
+        uname = request.form['username'].strip()
         pwd = request.form['password']
-        # Password strength check
-        if len(pwd) < 8 or not re.search(r'[A-Za-z]', pwd) or not re.search(r'[0-9]', pwd):
-            flash("Password must be at least 8 characters and include letters and numbers.", "danger")
+        confirm_pwd = request.form['confirm_password']
+        # Validate all fields
+        error = None
+        if not full_name or len(full_name) < 2:
+            error = "Full name must be at least 2 characters."
+        elif not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email):
+            error = "Invalid email address."
+        elif not phone.isdigit() or len(phone) != 10:
+            error = "Phone number must be exactly 10 digits."
+        elif len(uname) < 3:
+            error = "Username must be at least 3 characters."
+        elif len(pwd) < 8 or not re.search(r"[A-Z]", pwd) or not re.search(r"[a-z]", pwd) or not re.search(r"[0-9]", pwd) or not re.search(r"[@$!%*?&]", pwd):
+            error = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
+        elif pwd != confirm_pwd:
+            error = "Passwords do not match."
+        if error:
+            flash(error, "danger")
             return render_template('register.html')
         try:
             conn = sqlite3.connect('database.db')
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM users WHERE username=?", (uname,))
-            existing_user = cursor.fetchone()
-            if existing_user:
+            if cursor.fetchone():
                 flash("Username already taken. Please choose another or use Forgot Password.", "danger")
-            else:
-                cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (uname, pwd))
-                conn.commit()
-                flash("Registration successful! Please login.", "success")
                 conn.close()
-                return redirect(url_for('user.login'))
+                return render_template('register.html')
+            cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+            if cursor.fetchone():
+                flash("Email already registered. Please use another or login.", "danger")
+                conn.close()
+                return render_template('register.html')
+            cursor.execute("INSERT INTO users (full_name, email, phone, username, password) VALUES (?, ?, ?, ?, ?)", (full_name, email, phone, uname, pwd))
+            conn.commit()
+            flash("Registration successful! Please login.", "success")
             conn.close()
+            return redirect(url_for('user.login'))
         except Exception as e:
             logging.error(f"Registration error: {e}")
             flash("An error occurred during registration. Please try again later.", "danger")

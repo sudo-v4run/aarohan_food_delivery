@@ -4,40 +4,65 @@ import json
 import logging
 from datetime import datetime
 from realtime_utils import emit_order_status_update
+import re
 
 delivery_bp = Blueprint('delivery', __name__)
 
 @delivery_bp.route('/delivery_register', methods=['GET', 'POST'])
 def delivery_register():
     if request.method == 'POST':
-        username = request.form['username']
+        full_name = request.form['full_name'].strip()
+        email = request.form['email'].strip()
+        phone = request.form['phone'].strip()
+        username = request.form['username'].strip()
         password = request.form['password']
-        name = request.form['name']
-        phone = request.form['phone']
-        vehicle_number = request.form['vehicle_number']
-        vehicle_type = request.form['vehicle_type']
-        
+        confirm_pwd = request.form['confirm_password']
+        vehicle_number = request.form['vehicle_number'].strip()
+        vehicle_type = request.form['vehicle_type'].strip()
+        # Validate all fields
+        error = None
+        if not full_name or len(full_name) < 2:
+            error = "Full name must be at least 2 characters."
+        elif not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email):
+            error = "Invalid email address."
+        elif not phone.isdigit() or len(phone) != 10:
+            error = "Phone number must be exactly 10 digits."
+        elif len(username) < 3:
+            error = "Username must be at least 3 characters."
+        elif len(password) < 8 or not re.search(r"[A-Z]", password) or not re.search(r"[a-z]", password) or not re.search(r"[0-9]", password) or not re.search(r"[@$!%*?&]", password):
+            error = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
+        elif password != confirm_pwd:
+            error = "Passwords do not match."
+        elif not vehicle_number:
+            error = "Vehicle number is required."
+        elif not vehicle_type:
+            error = "Vehicle type is required."
+        if error:
+            flash(error, "danger")
+            return render_template('delivery_register.html')
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        
         # Check if username already exists
         cursor.execute('SELECT * FROM delivery_partners WHERE username = ?', (username,))
         if cursor.fetchone():
             flash('Username already exists!', 'error')
             conn.close()
             return render_template('delivery_register.html')
-        
+        # Check if email already exists
+        cursor.execute('SELECT * FROM delivery_partners WHERE email = ?', (email,))
+        if cursor.fetchone():
+            flash('Email already registered. Please use another or login.', 'danger')
+            conn.close()
+            return render_template('delivery_register.html')
         # Insert new delivery partner
         cursor.execute('''INSERT INTO delivery_partners 
-                         (username, password, name, phone, vehicle_number, vehicle_type) 
-                         VALUES (?, ?, ?, ?, ?, ?)''', 
-                      (username, password, name, phone, vehicle_number, vehicle_type))
+                         (full_name, email, phone, username, password, name, vehicle_number, vehicle_type) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', 
+                      (full_name, email, phone, username, password, full_name, vehicle_number, vehicle_type))
         conn.commit()
         conn.close()
-        
         flash('Registration successful! Please login.', 'success')
         return redirect(url_for('delivery.delivery_login'))
-    
     return render_template('delivery_register.html')
 
 @delivery_bp.route('/delivery_login', methods=['GET', 'POST'])
@@ -254,7 +279,6 @@ def assign_order(order_id):
     try:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        # Get delivery partner id
         cursor.execute('SELECT id FROM delivery_partners WHERE username=?', (session['delivery_partner'],))
         partner = cursor.fetchone()
         if not partner:
@@ -262,25 +286,14 @@ def assign_order(order_id):
             flash('Delivery partner not found.', 'danger')
             return redirect(url_for('delivery.delivery_dashboard'))
         partner_id = partner[0]
-        # Check if order is still available
-        cursor.execute('SELECT id FROM orders WHERE id=? AND order_status="Ready"', (order_id,))
-        order = cursor.fetchone()
-        if not order:
-            conn.close()
-            flash('Order is no longer available for assignment.', 'danger')
-            return redirect(url_for('delivery.delivery_dashboard'))
-        # Check if already assigned
-        cursor.execute('SELECT id FROM delivery_orders WHERE order_id=?', (order_id,))
-        already_assigned = cursor.fetchone()
-        if already_assigned:
-            conn.close()
+        # Try to assign order atomically
+        try:
+            cursor.execute('INSERT INTO delivery_orders (order_id, delivery_partner_id, status) VALUES (?, ?, ?)', (order_id, partner_id, 'Assigned'))
+            conn.commit()
+            flash('Order accepted and assigned to you!', 'success')
+        except sqlite3.IntegrityError:
             flash('Order has already been assigned to another partner.', 'danger')
-            return redirect(url_for('delivery.delivery_dashboard'))
-        # Assign order
-        cursor.execute('INSERT INTO delivery_orders (order_id, delivery_partner_id, status) VALUES (?, ?, ?)', (order_id, partner_id, 'Assigned'))
-        conn.commit()
         conn.close()
-        flash('Order accepted and assigned to you!', 'success')
     except Exception as e:
         logging.error(f"Assign order error: {e}")
         flash('An error occurred while accepting the order. Please try again later.', 'danger')
@@ -303,6 +316,13 @@ def update_order_status():
             flash('Delivery partner not found.', 'danger')
             return redirect(url_for('delivery.delivery_dashboard'))
         partner_id = partner[0]
+        # Ensure this delivery_order is assigned to this partner
+        cursor.execute('SELECT id FROM delivery_orders WHERE id=? AND delivery_partner_id=?', (delivery_order_id, partner_id))
+        valid_assignment = cursor.fetchone()
+        if not valid_assignment:
+            conn.close()
+            flash('You are not authorized to update this order.', 'danger')
+            return redirect(url_for('delivery.delivery_dashboard'))
         # Update delivery order status
         if new_status == 'Delivered':
             delivery_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

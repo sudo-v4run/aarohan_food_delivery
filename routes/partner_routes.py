@@ -3,18 +3,49 @@ import sqlite3
 import json
 import logging
 from set_default_hours import set_default_hours
+import re # Added for regex validation
 partner_bp = Blueprint('partner', __name__)
 
 @partner_bp.route('/partner_register', methods=['GET', 'POST'])
 def partner_register():
     if request.method == 'POST':
-        username = request.form['username']
+        full_name = request.form['full_name'].strip()
+        email = request.form['email'].strip()
+        phone = request.form['phone'].strip()
+        username = request.form['username'].strip()
         password = request.form['password']
-        contact = request.form['contact']
+        confirm_pwd = request.form['confirm_password']
+        # Validate all fields
+        error = None
+        if not full_name or len(full_name) < 2:
+            error = "Full name must be at least 2 characters."
+        elif not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email):
+            error = "Invalid email address."
+        elif not phone.isdigit() or len(phone) != 10:
+            error = "Phone number must be exactly 10 digits."
+        elif len(username) < 3:
+            error = "Username must be at least 3 characters."
+        elif len(password) < 8 or not re.search(r"[A-Z]", password) or not re.search(r"[a-z]", password) or not re.search(r"[0-9]", password) or not re.search(r"[@$!%*?&]", password):
+            error = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
+        elif password != confirm_pwd:
+            error = "Passwords do not match."
+        if error:
+            flash(error, "danger")
+            return render_template('partner_register.html')
         try:
             conn = sqlite3.connect('database.db')
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO restaurant_owners (username, password, contact) VALUES (?, ?, ?)', (username, password, contact))
+            cursor.execute('SELECT * FROM restaurant_owners WHERE username=?', (username,))
+            if cursor.fetchone():
+                flash('Username already exists. Please choose another.', 'danger')
+                conn.close()
+                return render_template('partner_register.html')
+            cursor.execute('SELECT * FROM restaurant_owners WHERE email=?', (email,))
+            if cursor.fetchone():
+                flash('Email already registered. Please use another or login.', 'danger')
+                conn.close()
+                return render_template('partner_register.html')
+            cursor.execute('INSERT INTO restaurant_owners (full_name, email, phone, username, password, contact) VALUES (?, ?, ?, ?, ?, ?)', (full_name, email, phone, username, password, phone))
             conn.commit()
             flash('Registration successful! Please login.', 'success')
             return redirect(url_for('partner.partner_login'))
@@ -23,7 +54,6 @@ def partner_register():
             flash('Username already exists or registration failed!', 'danger')
         finally:
             set_default_hours()
-           
             if 'conn' in locals():
                 conn.close()
     return render_template('partner_register.html')
@@ -110,6 +140,13 @@ def partner_restaurant_profile():
                 cursor.execute('INSERT INTO restaurants (name, cuisine, is_open) VALUES (?, ?, ?)', (name, cuisine, is_open))
                 new_restaurant_id = cursor.lastrowid
                 cursor.execute('UPDATE restaurant_owners SET restaurant_id=? WHERE id=?', (new_restaurant_id, owner_id))
+                # Set default hours: 9:00 to 23:00 for all days
+                days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                for day in days:
+                    cursor.execute(
+                        'INSERT INTO restaurant_hours (restaurant_id, day_of_week, open_time, close_time) VALUES (?, ?, ?, ?)',
+                        (new_restaurant_id, day, '09:00', '23:00')
+                    )
                 flash('Restaurant profile created!', 'success')
                 restaurant_id = new_restaurant_id
                 cursor.execute('SELECT id, name, cuisine, is_open FROM restaurants WHERE id=?', (restaurant_id,))
