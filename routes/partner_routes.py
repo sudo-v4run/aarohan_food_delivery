@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 import sqlite3
 import json
 import logging
-
+from set_default_hours import set_default_hours
 partner_bp = Blueprint('partner', __name__)
 
 @partner_bp.route('/partner_register', methods=['GET', 'POST'])
@@ -22,6 +22,8 @@ def partner_register():
             logging.error(f"Partner registration error: {e}")
             flash('Username already exists or registration failed!', 'danger')
         finally:
+            set_default_hours()
+           
             if 'conn' in locals():
                 conn.close()
     return render_template('partner_register.html')

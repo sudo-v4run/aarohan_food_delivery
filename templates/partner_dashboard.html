@@ -3,29 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <title>Partner Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .dashboard-header {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #185a9d;
+            margin-bottom: 1.5rem;
+        }
+        .info-card {
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(67, 206, 162, 0.08);
+            margin-bottom: 2rem;
+        }
+        .info-icon {
+            font-size: 2.5rem;
+            color: #43cea2;
+            margin-right: 1rem;
+        }
+        .quick-links .btn {
+            min-width: 220px;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-5">
-    <h2>Welcome, {{ partner.username }}!</h2>
+    <div class="dashboard-header mb-4">👨‍🍳 Welcome, {{ partner.username }}!</div>
     {% if partner.restaurant_name %}
-        <div class="alert alert-info">
-            <strong>Restaurant:</strong> {{ partner.restaurant_name }}<br>
-            <strong>Cuisine:</strong> {{ partner.cuisine }}<br>
-            <strong>Status:</strong> <span class="badge bg-{{ 'success' if partner.is_open else 'danger' }}">{{ 'Open' if partner.is_open else 'Closed' }}</span>
+        <div class="card info-card mb-4">
+            <div class="card-body d-flex align-items-center">
+                <span class="info-icon">🍽️</span>
+                <div>
+                    <h4 class="mb-1">{{ partner.restaurant_name }}</h4>
+                    <div class="mb-1"><strong>Cuisine:</strong> {{ partner.cuisine }}</div>
+                    <div><strong>Status:</strong> <span class="badge bg-{{ 'success' if partner.is_open else 'danger' }}">{{ 'Open' if partner.is_open else 'Closed' }}</span></div>
+                </div>
+            </div>
         </div>
     {% else %}
         <div class="alert alert-warning">No restaurant profile found. Please create your restaurant profile.</div>
     {% endif %}
-    <a href="/partner_restaurant_profile" class="btn btn-primary me-2">Manage Restaurant Profile</a>
-    <a href="/partner_menu" class="btn btn-success me-2">Manage Menu</a>
-    <a href="/partner_orders" class="btn btn-warning me-2">Manage Orders</a>
-    <a href="/partner_reviews" class="btn btn-info me-2">View Customer Reviews</a>
-    <a href="/partner_hours" class="btn btn-dark me-2">Manage Hours & Holidays</a>
-    <form method="post" action="/partner_delete_restaurant" onsubmit="return confirm('Are you sure you want to delete your restaurant and all its data? This cannot be undone.');" class="d-inline">
-        <button type="submit" class="btn btn-outline-danger">Delete My Restaurant</button>
-    </form>
-    <a href="/logout" class="btn btn-danger">Logout</a>
+    <div class="row quick-links">
+        <div class="col-md-4">
+            <a href="/partner_restaurant_profile" class="btn btn-primary w-100 mb-3">🏢 Manage Restaurant Profile</a>
+        </div>
+        <div class="col-md-4">
+            <a href="/partner_menu" class="btn btn-success w-100 mb-3">🍲 Manage Menu</a>
+        </div>
+        <div class="col-md-4">
+            <a href="/partner_orders" class="btn btn-warning w-100 mb-3">🧾 Manage Orders</a>
+        </div>
+        <div class="col-md-4">
+            <a href="/partner_reviews" class="btn btn-info w-100 mb-3">⭐ View Customer Reviews</a>
+        </div>
+        <div class="col-md-4">
+            <a href="/partner_hours" class="btn btn-dark w-100 mb-3">⏰ Manage Hours & Holidays</a>
+        </div>
+        <div class="col-md-4">
+            <form method="post" action="/partner_delete_restaurant" onsubmit="return confirm('Are you sure you want to delete your restaurant and all its data? This cannot be undone.');" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger w-100 mb-3">🗑️ Delete My Restaurant</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <a href="/logout" class="btn btn-danger w-100 mb-3">🚪 Logout</a>
+        </div>
+    </div>
 </div>
 </body>
 </html> 

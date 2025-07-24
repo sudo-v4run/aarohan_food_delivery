@@ -133,6 +133,16 @@ def profile():
                 conn.commit()
                 flash('Address deleted!', 'danger')
             return redirect(url_for('user.profile'))
+        # Handle add address
+        if request.method == 'POST' and 'add_address' in request.form:
+            new_address = request.form['address'].strip()
+            if not new_address:
+                flash('Address cannot be empty.', 'danger')
+            else:
+                cursor.execute('INSERT INTO addresses (user_id, address) VALUES (?, ?)', (user_id, new_address))
+                conn.commit()
+                flash('Address added!', 'success')
+            return redirect(url_for('user.profile'))
         cursor.execute('SELECT id, address FROM addresses WHERE user_id=?', (user_id,))
         addresses = cursor.fetchall()
     except Exception as e:
@@ -264,8 +274,7 @@ def place_order():
         items_json = json.dumps(cart_items)
         total = sum(item['price'] * item['quantity'] for item in cart_items)
         username = session['user']
-        from datetime import datetime
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         cursor.execute(
@@ -457,8 +466,9 @@ def submit_review(order_id):
         conn.close()
         flash('You have already reviewed this order.', 'info')
         return redirect(url_for('user.order_history'))
-    cursor.execute('INSERT INTO reviews (user_id, restaurant_id, order_id, rating, review) VALUES (?, ?, ?, ?, ?)',
-                   (user_id, restaurant_id, order_id, rating, review_text))
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    cursor.execute('INSERT INTO reviews (user_id, restaurant_id, order_id, rating, review, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
+                   (user_id, restaurant_id, order_id, rating, review_text, now))
     # Update restaurant's average rating
     cursor.execute('SELECT AVG(rating) FROM reviews WHERE restaurant_id=?', (restaurant_id,))
     avg_rating = cursor.fetchone()[0]

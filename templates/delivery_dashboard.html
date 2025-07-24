@@ -2,73 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Delivery Partner Dashboard - Aarohan Food Delivery</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivery Dashboard - Aarohan Food Delivery</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .dashboard-header {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #185a9d;
+            margin-bottom: 1.5rem;
+        }
+        .profile-card {
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(67, 206, 162, 0.08);
+            margin-bottom: 2rem;
+        }
+        .profile-icon {
+            font-size: 2.5rem;
+            color: #43cea2;
+            margin-right: 1rem;
+        }
+        .status-badge {
+            font-size: 1rem;
+            padding: 0.5em 1em;
+            border-radius: 1rem;
+        }
+        .quick-links .btn {
+            min-width: 200px;
+            margin-bottom: 1rem;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #185a9d;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('delivery.delivery_dashboard') }}">
-                🚚 Delivery Partner Dashboard
-            </a>
+            <a class="navbar-brand" href="/delivery_dashboard">Aarohan Delivery Dashboard</a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('delivery.delivery_profile') }}">Profile</a>
-                <a class="nav-link" href="{{ url_for('delivery.delivery_logout') }}">Logout</a>
+                <a class="nav-link" href="/delivery_profile">Profile</a>
+                <a class="nav-link" href="/delivery_logout">Logout</a>
             </div>
         </div>
     </nav>
-
     <div class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <!-- Partner Info Card -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>👤 Partner Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Name:</strong> {{ partner['name'] }}</p>
-                        <p><strong>Phone:</strong> {{ partner['phone'] }}</p>
-                        <p><strong>Vehicle:</strong> {{ partner['vehicle_type'] }} ({{ partner['vehicle_number'] }})</p>
-                        <p><strong>Rating:</strong> ⭐ {{ '%.1f'|format(partner['rating']) if partner['rating'] else 'No ratings yet' }}</p>
-                        <p><strong>Total Deliveries:</strong> {{ partner['total_deliveries'] }}</p>
+        <div class="dashboard-header mb-4">🚚 Welcome, {{ partner['name'] }}!</div>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card profile-card">
+                    <div class="card-body d-flex align-items-center">
+                        <span class="profile-icon">👤</span>
+                        <div>
+                            <h4 class="mb-1">{{ partner['name'] }}</h4>
+                            <div class="mb-1"><strong>Phone:</strong> {{ partner['phone'] }}</div>
+                            <div class="mb-1"><strong>Vehicle:</strong> {{ partner['vehicle_type'] }} ({{ partner['vehicle_number'] }})</div>
+                            <div class="mb-1"><strong>Rating:</strong> ⭐ {{ '%.1f'|format(partner['rating']) if partner['rating'] else 'No ratings yet' }}</div>
+                            <div class="mb-1"><strong>Total Deliveries:</strong> {{ partner['total_deliveries'] }}</div>
+                            <div><strong>Status:</strong> <span class="badge status-badge bg-{{ 'success' if partner['is_available'] else 'danger' }}">{{ 'Available' if partner['is_available'] else 'Not Available' }}</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>🔄 Availability Status</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="{{ url_for('delivery.toggle_availability') }}">
-                            <button type="submit" class="btn btn-{{ 'success' if partner['is_available'] else 'danger' }}">
-                                {{ 'Set Not Available' if partner['is_available'] else 'Set Available' }}
-                            </button>
-                        </form>
-                        <p class="mt-3">
-                            <span class="badge bg-{{ 'success' if partner['is_available'] else 'danger' }}">
-                                {{ 'Available' if partner['is_available'] else 'Not Available' }}
-                            </span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
+            <div class="col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body text-center">
                         <h5 class="card-title">Profile & Settings</h5>
@@ -77,13 +77,22 @@
                         <a href="/delivery_ratings" class="btn btn-info">My Ratings</a>
                     </div>
                 </div>
+                <div class="card mt-3">
+                    <div class="card-body text-center">
+                        <form method="POST" action="{{ url_for('delivery.toggle_availability') }}">
+                            <button type="submit" class="btn btn-{{ 'success' if partner['is_available'] else 'danger' }}">
+                                {{ 'Set Not Available' if partner['is_available'] else 'Set Available' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- Available Orders -->
+        <div class="section-title">📦 Available Orders</div>
+        <!-- Available Orders Table (unchanged) -->
         <div class="card mb-4">
             <div class="card-header">
-                <h5>🆕 Available Orders</h5>
+                <h5>📦 Available Orders</h5>
             </div>
             <div class="card-body">
                 {% if available_orders %}
@@ -138,11 +147,11 @@
                 {% endif %}
             </div>
         </div>
-
-        <!-- Assigned Orders -->
+        <div class="section-title">🚚 Current Assigned Orders</div>
+        <!-- Assigned Orders Table (unchanged) -->
         <div class="card mb-4">
             <div class="card-header">
-                <h5>📦 Current Assigned Orders</h5>
+                <h5>🚚 Current Assigned Orders</h5>
             </div>
             <div class="card-body">
                 {% if assigned_orders %}
@@ -206,9 +215,9 @@
                 {% endif %}
             </div>
         </div>
-
-        <!-- Delivery History -->
-        <div class="card">
+        <div class="section-title">📋 Recent Delivery History</div>
+        <!-- Delivery History Table (unchanged) -->
+        <div class="card mb-4">
             <div class="card-header">
                 <h5>📋 Recent Delivery History</h5>
             </div>
@@ -253,8 +262,7 @@
                 {% endif %}
             </div>
         </div>
-
-        <!-- Delivery Feedback Section -->
+        <div class="section-title">⭐ Delivery Feedback & Ratings</div>
         <div class="card mt-4">
             <div class="card-header">
                 <h5>⭐ Delivery Feedback & Ratings</h5>
@@ -292,7 +300,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 

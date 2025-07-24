@@ -89,4 +89,77 @@ def delete_food(item_id):
     except Exception as e:
         logging.error(f"Delete food error: {e}")
         flash('An error occurred while deleting the food item. Please try again later.', 'danger')
-        return redirect(url_for('admin.admin_foods')) 
+        return redirect(url_for('admin.admin_foods'))
+
+@admin_bp.route('/admin/assign_orders')
+def admin_assign_orders():
+    if 'admin' not in session or not session['admin']:
+        return redirect(url_for('user.login'))
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        # Fetch orders that are not delivered and not assigned
+        cursor.execute('''
+            SELECT o.id, o.username, o.items, o.total, o.order_status, o.timestamp,
+                   do.delivery_partner_id
+            FROM orders o
+            LEFT JOIN delivery_orders do ON o.id = do.order_id
+            WHERE o.order_status != 'Delivered' AND do.delivery_partner_id IS NULL
+            ORDER BY o.timestamp ASC
+        ''')
+        all_orders = cursor.fetchall()
+        orders = []
+        for oid, username, items, total, order_status, timestamp, delivery_partner_id in all_orders:
+            item_list = json.loads(items)
+            assigned_to = None
+            if delivery_partner_id:
+                cursor.execute('SELECT name FROM delivery_partners WHERE id=?', (delivery_partner_id,))
+                partner_row = cursor.fetchone()
+                assigned_to = partner_row[0] if partner_row else 'Unknown'
+            orders.append({
+                'id': oid,
+                'username': username,
+                'items': item_list,
+                'total': total,
+                'order_status': order_status,
+                'timestamp': timestamp,
+                'assigned_to': assigned_to
+            })
+        # Fetch all delivery partners
+        cursor.execute('SELECT id, name, vehicle_type, current_location, rating FROM delivery_partners')
+        partners = cursor.fetchall()
+        conn.close()
+        return render_template('admin_assign_orders.html', orders=orders, partners=partners)
+    except Exception as e:
+        logging.error(f"Admin assign orders error: {e}")
+        flash('An error occurred while loading assign orders.', 'danger')
+        return render_template('admin_assign_orders.html', orders=[], partners=[])
+
+@admin_bp.route('/admin/assign_order/<int:order_id>', methods=['POST'])
+def assign_order_to_partner(order_id):
+    if 'admin' not in session or not session['admin']:
+        return redirect(url_for('user.login'))
+    delivery_partner_id = request.form.get('delivery_partner_id')
+    if not delivery_partner_id:
+        flash('Please select a delivery partner.', 'danger')
+        return redirect(url_for('admin_assign_orders'))
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        # Check if already assigned
+        cursor.execute('SELECT id FROM delivery_orders WHERE order_id=?', (order_id,))
+        if cursor.fetchone():
+            flash('Order is already assigned to a delivery partner.', 'warning')
+            conn.close()
+            return redirect(url_for('admin_assign_orders'))
+        # Assign order
+        cursor.execute('INSERT INTO delivery_orders (order_id, delivery_partner_id, status) VALUES (?, ?, ?)', (order_id, delivery_partner_id, 'Assigned'))
+        # Optionally update order status
+        cursor.execute('UPDATE orders SET order_status=? WHERE id=?', ('Out for Delivery', order_id))
+        conn.commit()
+        conn.close()
+        flash('Order assigned to delivery partner!', 'success')
+    except Exception as e:
+        logging.error(f"Assign order error: {e}")
+        flash('An error occurred while assigning the order.', 'danger')
+    return redirect(url_for('admin_assign_orders')) 

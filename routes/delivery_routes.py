@@ -53,6 +53,7 @@ def delivery_login():
             conn.close()
             if partner:
                 session['delivery_partner'] = username
+                session['delivery_partner_id'] = partner[0]
                 flash('Logged in as delivery partner!', 'success')
                 return redirect(url_for('delivery.delivery_dashboard'))
             else:
@@ -195,10 +196,9 @@ def delivery_dashboard():
 
 @delivery_bp.route('/delivery_logout')
 def delivery_logout():
+    session.pop('delivery_partner', None)
     session.pop('delivery_partner_id', None)
-    session.pop('delivery_username', None)
-    session.pop('delivery_name', None)
-    flash('Logged out successfully!', 'success')
+    flash('Logged out.')
     return redirect(url_for('delivery.delivery_login'))
 
 @delivery_bp.route('/toggle_availability', methods=['POST'])
